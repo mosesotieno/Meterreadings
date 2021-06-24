@@ -48,3 +48,8 @@ vignettes/*.pdf
 # Ignore .dea
 
 .idea/
+
+
+# Ignore the rsconnect
+
+rsconnect/
