@@ -19,14 +19,15 @@ library(odbc)
 library(lubridate)
 library(kableExtra)
 
-#---- Import Data
-
-
-kplcreadings <- read_rds("kplcreadings.rds")
-kiwascoreadings <- read_rds("kiwascoreadings.rds")
-
 
 ```
+
+```{r global, include=FALSE}
+#---- Import Data
+kplcreadings <- read_rds("kplcreadings.rds")
+kiwascoreadings <- read_rds("kiwascoreadings.rds")
+```
+
 
 
 Inputs {.sidebar}
@@ -82,7 +83,7 @@ Dataset can also be downloaded.
   )
 ```
 
-KPLC
+KPLC 
 ======
 
 Column {data-width=350}
@@ -163,7 +164,7 @@ tableOutput("kplctop")
 
 
 
-KIWASCO
+KIWASCO 
 ======
 
 Column {data-width=350}
