@@ -1,0 +1,277 @@
+---
+title: "My Meter Readings"
+author: "Moses Otieno"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+    social: menu
+runtime: shiny
+---
+
+```{r setup, include=FALSE, cache=TRUE}
+library(flexdashboard)
+library(tidyverse)
+library(plotly)
+library(shiny)
+library(DT)
+library(odbc)
+library(lubridate)
+library(kableExtra)
+#---- Import Data
+
+db <-  dbConnect(odbc(),
+                 Driver = "MySQL ODBC 8.0 ANSI Driver",
+                 Server = Sys.getenv("server"),
+                 database = "meterreading",
+                 uid = Sys.getenv("uid"),
+                 pwd = Sys.getenv("pwd"))
+
+
+#---- Pull the tables each company ----
+
+# KPLC
+kplcreadings <- as_tibble(dbGetQuery(db,'
+select entry_date, reading from kplcreading
+'))
+
+# KIWASCO
+kiwascoreadings <- as_tibble(dbGetQuery(db,'
+select entry_date, reading from kiwascoreading
+'))
+
+
+# Create a function to manage the datasets
+
+managereadings <- function(data){
+  data <- data %>%
+    mutate(units = reading - lag(reading),
+           entry_date = as.Date(entry_date),
+           daydiff = as.integer(entry_date - lag(entry_date)),
+           units_perday = round(units/as.integer(daydiff),1),
+           month_read = month(entry_date, label = T,
+                                  abbr = F),
+           date_read = format(entry_date, "%d-%B-%Y"))
+}
+
+
+kplcreadings <- managereadings(kplcreadings) %>% 
+  mutate(source = "kplc")
+kiwascoreadings <- managereadings(kiwascoreadings) %>% 
+  mutate(source = "kiwasco")
+
+
+readings <- bind_rows(kplcreadings, kiwascoreadings)
+
+```
+
+
+Inputs {.sidebar}
+-------------------------------------------------------------------
+
+
+```{r}
+ selectInput("month_read", "Select month",
+                            choices = month.name,
+                            selected = month(Sys.Date(), label = T,
+                                             abbr = F))
+selectInput("dataset", "Chooses a dataset to download",
+    choices = c("KPLC", "KIWASCO"),
+    selected = "KPLC")
+# Button
+uiOutput("downloadUI")
+
+# Create the actual downloadButton
+output$downloadUI <- renderUI( {
+  downloadButton("downBtn", "Download", style = "width:100%;")
+})
+
+
+```
+
+
+
+This is an application developed to help track the  
+consumption of electricity and water. The meter  
+readings for each item is keyed into the database  
+(MySQL through Python) on a daily basis. This    
+Shiny application then pick that data and analyze  
+based on the month selected.  
+Dataset can also be downloaded.
+
+```{r }
+  # Reactive value for selected dataset ----
+  datasetInput <- reactive({
+    switch(input$dataset,
+           "KPLC" = kplcreadings,
+           "KIWASCO" = kiwascoreadings)
+  })
+
+  # Downloadable csv of selected dataset ----
+
+  output$downBtn <- downloadHandler(
+    filename = function() {
+      paste(input$dataset, ".csv", sep = "")
+    },
+    content = function(file) {
+      write.csv(datasetInput(), file, row.names = FALSE)
+    }
+  )
+```
+
+KPLC
+======
+
+Column {data-width=350}
+--------------------------------------------------------------------
+
+Row {.tabset}
+-------------------------------------------------------------------
+
+### Raw Data
+```{r}
+kplcdata1 <- reactive({
+    kplcreadings %>%
+      filter(month_read %in% input$month_read) %>% 
+    select(-entry_date, -source) %>% 
+    select(date_read , everything())
+  })
+
+renderDataTable(kplcdata1())
+```
+
+### Graph
+
+```{r kplcgraph}
+kplcdata <- reactive({
+    kplcreadings %>%
+      filter(month_read %in% input$month_read)
+  })
+
+
+
+renderPlotly({
+    if(input$month_read %in% kplcdata()$month_read){
+      ggplot(kplcdata(), aes(entry_date, units_perday)) +
+      geom_point() +
+      geom_line() +
+      ggtitle(paste("Distribution of units in ", input$month_read))
+
+    }else{
+      ggplot(kplcdata(), aes(entry_date, units_perday)) +
+        ggtitle(paste("No data for", input$month_read))
+    }
+  })
+
+
+
+```
+
+
+### Summary on consumption
+#### Monthly summary
+Below is the daily summary of electricity consumption in the month of `r renderText(input$month_read)`
+```{r}
+renderPrint(summary(kplcdata()$units_perday))
+
+```
+
+
+#### Top five days 
+
+```{r}
+tableOutput("kplctop")
+
+
+#knitr::kable(kplcreadings %>%  slice_max(units_perday, n = 5))
+
+   output$kplctop <- function() {
+     kplcreadings %>%
+       filter(month_read %in% input$month_read) %>%
+       mutate(day_read = weekdays(entry_date)) %>% 
+       select(-month_read, -source, -entry_date) %>% 
+       select(date_read, day_read, reading, units, daydiff, units_perday, everything()) %>% 
+       slice_max(units_perday, n = 5) %>% 
+       knitr::kable("html") %>%
+       kable_styling("striped", full_width = T) 
+   }
+
+```
+
+
+
+KIWASCO
+======
+
+Column {data-width=350}
+--------------------------------------------------------------------
+
+Row {.tabset}
+-------------------------------------------------------------------
+
+### Raw Data
+```{r}
+kiwascodata1 <- reactive({
+    kiwascoreadings %>%
+      filter(month_read %in% input$month_read) %>% 
+      select(-entry_date, -source) %>% 
+      select(date_read, everything())
+  })
+
+
+renderDataTable(kiwascodata1())
+```
+
+### Graph
+
+```{r}
+kiwascodata <- reactive({
+    kiwascoreadings %>%
+      filter(month_read %in% input$month_read)
+  })
+
+renderPlotly({
+    if(input$month_read %in% kiwascodata()$month_read){
+      ggplot(kiwascodata(), aes(entry_date, units_perday)) +
+      geom_point() +
+      geom_line() +
+      ggtitle(paste("Distribution of units in ", input$month_read))
+    }else{
+      ggplot(kiwascodata(), aes(entry_date, units_perday)) +
+        ggtitle(paste("No data for", input$month_read))
+    }
+  })
+```
+
+
+### Summary on consumption
+#### Monthly summary
+Below is the daily summary of water consumption in the month of `r renderText(input$month_read)`
+
+```{r}
+renderPrint(summary(kiwascodata()$units_perday))
+
+```
+
+#### Top five days 
+
+```{r}
+
+tableOutput("kiwascotop")
+
+
+#knitr::kable(kplcreadings %>%  slice_max(units_perday, n = 5))
+
+   output$kiwascotop <- function() {
+     kiwascoreadings %>%
+       filter(month_read %in% input$month_read) %>%
+       mutate(day_read = weekdays(entry_date)) %>%
+       select(-month_read, -source, -entry_date) %>%
+       select(date_read, day_read, reading, units, daydiff, units_perday, everything()) %>% 
+       slice_max(units_perday, n = 5) %>% 
+       knitr::kable("html") %>%
+       kable_styling("striped", full_width = T) 
+   }
+```
+
+
