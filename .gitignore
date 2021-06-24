@@ -37,3 +37,14 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
+
+
+
+# Ignore .ini files
+
+*.ini
+
+
+# Ignore .dea
+
+.idea/
