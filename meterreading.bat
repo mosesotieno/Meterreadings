@@ -37,3 +37,5 @@ python "D:\InterestingTasks\meterreadings\insert_readings.py"
 :: Run the R script to update the datasets
 
 START "" "C:\Program Files\R\R-4.0.5\bin\x64\Rscript.exe" 01_importdata.R /b
+
+pause
