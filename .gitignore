@@ -53,3 +53,8 @@ vignettes/*.pdf
 # Ignore the rsconnect
 
 rsconnect/
+
+
+# Ignore the script to pull out data
+
+01_importdata.R
