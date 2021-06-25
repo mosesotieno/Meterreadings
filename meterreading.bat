@@ -38,4 +38,13 @@ python "D:\InterestingTasks\meterreadings\insert_readings.py"
 
 START "" "C:\Program Files\R\R-4.0.5\bin\x64\Rscript.exe" 01_importdata.R /b
 
+:: Automatically commit the datasets and push them to repo
+
+git add kiwascoreadings.rds kplcreadings.rds
+
+git commit -m "Updated the two datasets"
+
+git push origin master
+
+
 pause
