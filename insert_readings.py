@@ -69,10 +69,13 @@ entries = list(set(entries))
 # Todays date
 
 todays_date = date.today()  # Todays dates
+step = datetime.timedelta(days=1)
+tomorrow_date = todays_date + step
+tomorrow_date = tomorrow_date.strftime('%d-%B-%Y')
 
 step = datetime.timedelta(days=1)
 
 if todays_date not in entries:
     enter_details()
 else:
-    print(f"The entry has been made check again on {todays_date + step}")
+    print(f"The entry has been made check again on {tomorrow_date}")
