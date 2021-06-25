@@ -11,6 +11,8 @@
 
 from mysql.connector import MySQLConnection
 from python_mysql_dbconfig import read_db_config
+from datetime import date
+import datetime
 
 # ---- Configure the databases
 
@@ -41,4 +43,36 @@ def enter_details():
             conn.commit()
 
 
-enter_details()
+# First check whether entry has been made for the day
+
+# Pull the entry_dates from the table
+
+mycursor.execute("SELECT entry_date FROM kplcreading")
+
+kplcentries = mycursor.fetchall()
+
+mycursor.execute("SELECT entry_date FROM kiwascoreading")
+
+kiwascoentries = mycursor.fetchall()
+
+allentries = kplcentries + kiwascoentries
+
+# Convert the entries from tuples to dates and store in a list
+entries = []
+
+for i in allentries:
+    for j in i:
+        entries.append(j.date())
+
+entries = list(set(entries))
+
+# Todays date
+
+todays_date = date.today()  # Todays dates
+
+step = datetime.timedelta(days=1)
+
+if todays_date not in entries:
+    enter_details()
+else:
+    print(f"The entry has been made check again on {todays_date + step}")
