@@ -96,9 +96,10 @@ Row {.tabset}
 ```{r}
 kplcdata1 <- reactive({
     kplcreadings %>%
+      arrange(desc(entry_date)) %>% 
       filter(month_read %in% input$month_read) %>% 
-    select(-entry_date, -source) %>% 
-    select(date_read , everything())
+      select(-entry_date, -source) %>% 
+      select(date_read , everything())
   })
 
 renderDataTable(kplcdata1())
@@ -177,6 +178,7 @@ Row {.tabset}
 ```{r}
 kiwascodata1 <- reactive({
     kiwascoreadings %>%
+      arrange(desc(entry_date)) %>% 
       filter(month_read %in% input$month_read) %>% 
       select(-entry_date, -source) %>% 
       select(date_read, everything())
