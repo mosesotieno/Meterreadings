@@ -32,4 +32,4 @@ mycursor.execute("CREATE TABLE IF NOT EXISTS kplcreading"
 mycursor.execute("CREATE TABLE IF NOT EXISTS kiwascoreading"
                  "(id INT AUTO_INCREMENT PRIMARY KEY, "
                  "entry_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP," 
-                 "reading INT NOT NULL CHECK (reading>=586754))")
+                 "reading INT NOT NULL CHECK (reading>=5867543))")
