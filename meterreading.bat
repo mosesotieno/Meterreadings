@@ -46,5 +46,7 @@ git commit -m "Updated the two datasets"
 
 git push origin master
 
+:: Run the python script to submit readings to mail
+python "D:\InterestingTasks\meterreadings\04_sendupdates.py"
 
 pause
