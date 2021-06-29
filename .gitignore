@@ -59,3 +59,9 @@ rsconnect/
 
 01_importdata.R
 __pycache__/
+
+
+# Ignore script for sending files
+
+04_sendupdates.py
+05_sendmail.py
