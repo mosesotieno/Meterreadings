@@ -138,6 +138,7 @@ renderPlotly({
 Below is the daily summary of electricity consumption in the month of `r renderText(input$month_read)`
 ```{r}
 renderPrint(summary(kplcdata()$units_perday))
+renderText(paste("The sum total of consumption as at  ", max(kplcdata()$date_read, na.rm = T) ,"is",sum(kplcdata()$units_perday, na.rm = T)))
 
 ```
 
@@ -216,6 +217,7 @@ Below is the daily summary of water consumption in the month of `r renderText(in
 
 ```{r}
 renderPrint(summary(kiwascodata()$units_perday))
+renderText(paste("The sum total of consumption as at  ", max(kiwascodata()$date_read, na.rm = T) ,"is",sum(kiwascodata()$units_perday, na.rm = T)))
 
 ```
 
