@@ -93,7 +93,7 @@ def sendhtml(reading):
     server.sendmail(msg['From'], emaillist, msg.as_string())
 
 
-if todays_date != lastdate:
+if todays_date == lastdate:
     sendhtml(kplcdata)
     sendhtml(kiwascodata)
 else:
