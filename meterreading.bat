@@ -49,4 +49,9 @@ git push origin master
 :: Run the python script to submit readings to mail
 python "D:\InterestingTasks\meterreadings\04_sendupdates.py"
 
+
+:: Launch the applcation
+
+Rscript -e "rmarkdown::run('"D:\\InterestingTasks\\meterreadings\\meterreadingdash.Rmd"', shiny_args = list(launch.browser = TRUE))"
+
 pause
