@@ -59,9 +59,9 @@ This is an application developed to help track the
 consumption of electricity and water. The meter  
 readings for each item is keyed into the database  
 (MySQL through Python) on a daily basis. This    
-Shiny application then pick that data and analyze  
-based on the month selected.  
-Dataset can also be downloaded.
+Shiny application then picks that data and analyzes  
+it based on the month selected.   
+The dataset can also be downloaded.
 
 ```{r }
   # Reactive value for selected dataset ----
@@ -140,6 +140,8 @@ Below is the daily summary of electricity consumption in the month of `r renderT
 renderPrint(summary(kplcdata()$units_perday))
 renderText(paste("The sum total of consumption as at  ", max(kplcdata()$date_read, na.rm = T) ,"is",sum(kplcdata()$units_perday, na.rm = T)))
 
+renderText(paste("Expected to pay", sum(kplcdata()$units_perday, na.rm = T) * 18))
+
 ```
 
 
@@ -164,6 +166,21 @@ tableOutput("kplctop")
 
 ```
 
+
+### Yearly consumption
+
+```{r }
+kplcdata2 <- reactive({
+    kplcreadings %>%
+      group_by(month_read) %>% 
+      summarise(monthlyunits = sum(units_perday, na.rm = TRUE),
+                sdunits = sd(units_perday, na.rm = TRUE))
+  })
+
+renderPlotly(kplcdata2() %>% ggplot(aes(month_read, monthlyunits, group=1)) + geom_point() + geom_line(color="red") + geom_errorbar(aes(ymin=monthlyunits-sdunits, ymax=monthlyunits+sdunits), width=.1))
+
+
+```
 
 
 KIWASCO 
