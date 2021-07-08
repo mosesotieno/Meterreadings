@@ -40,7 +40,8 @@ START "" "C:\Program Files\R\R-4.0.5\bin\x64\Rscript.exe" 01_importdata.R /b
 
 :: Automatically commit the datasets and push them to repo
 
-git add kiwascoreadings.rds kplcreadings.rds
+git add  meterreading/kiwascoreadings.rds meterreading/kplcreadings.rds
+
 
 git commit -m "Updated the two datasets"
 
@@ -52,6 +53,6 @@ python "D:\InterestingTasks\meterreadings\04_sendupdates.py"
 
 :: Launch the applcation
 
-Rscript -e "rmarkdown::run('"D:\\InterestingTasks\\meterreadings\\meterreadingdash.Rmd"', shiny_args = list(launch.browser = TRUE))"
+Rscript -e "rmarkdown::run('"D:/InterestingTasks/meterreadings/meterreading/meterreadingdash.Rmd"', shiny_args = list(launch.browser = TRUE))"
 
 pause
