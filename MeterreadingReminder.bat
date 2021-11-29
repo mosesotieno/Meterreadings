@@ -31,3 +31,7 @@ cd "D:\InterestingTasks\meterreadings"
 
 :: Run the python script to enter meter readings
 python "D:\InterestingTasks\meterreadings\03_confirmentry.py"
+
+
+:: Run the script that checks whether self reading has been done
+python "D:\InterestingTasks\meterreadings\insertselfreadingkplc.py"

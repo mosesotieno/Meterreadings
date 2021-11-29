@@ -52,6 +52,8 @@ step = datetime.timedelta(days=1)
 tomorrow_date = todays_date + step
 tomorrow_date = tomorrow_date.strftime('%d-%B-%Y')
 
+today_date = todays_date.strftime('%d-%B-%Y')
+
 # Configure the email
 
 msg = EmailMessage()
@@ -61,9 +63,10 @@ msg['From'] = "Moses Otieno"
 msg['To'] = 'mosotieno25@gmail.com'
 
 msg.set_content("Hello sir, " + "\n"
-                                "This is to remind  you that you have not taken the meter readings "
-                                "for KPLC and KIWASCO" + "\n\n"
-                                                         "Moses Data")
+                                "This is to remind  you that you have not taken the meter readings on "
+                + today_date +
+                " for KPLC and KIWASCO" + "\n\n"
+                                          "Moses Data")
 
 server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
 server.login('mosedata2021@gmail.com', "J@yalo100")
