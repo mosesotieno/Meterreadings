@@ -36,6 +36,12 @@ Inputs {.sidebar}
 
 
 ```{r}
+ selectInput("year_read", "Select year",
+                            choices = c(2021, 2022, 2023, 2024),
+                            selected = year(Sys.Date()))
+
+
+
  selectInput("month_read", "Select month",
                             choices = month.name,
                             selected = month(Sys.Date(), label = T,
@@ -98,7 +104,7 @@ Row {.tabset}
 kplcdata1 <- reactive({
     kplcreadings %>%
       arrange(desc(entry_date)) %>% 
-      filter(month_read %in% input$month_read) %>% 
+      filter(month_read %in% input$month_read & year_read %in% input$year_read) %>% 
       select(-entry_date, -source) %>% 
       select(date_read , everything())
   })
@@ -111,7 +117,7 @@ renderDataTable(kplcdata1())
 ```{r kplcgraph}
 kplcdata <- reactive({
     kplcreadings %>%
-      filter(month_read %in% input$month_read)
+      filter(month_read %in% input$month_read & year_read %in% input$year_read)
   })
 
 kplcselfdata <- reactive({
